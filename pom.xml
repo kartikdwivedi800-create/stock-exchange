@@ -25,8 +25,13 @@
     </properties>
 
     <modules>
+        <module>common-library</module>
         <module>services/connectivity-test-service</module>
         <module>services/user-service</module>
+        <module>services/wallet-service</module>
+        <module>services/order-service</module>
+        <module>services/portfolio-service</module>
+        <module>services/stock-service</module>
     </modules>
 
 </project>
