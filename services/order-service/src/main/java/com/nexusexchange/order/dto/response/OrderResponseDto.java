@@ -1,9 +1,12 @@
 package com.nexusexchange.order.dto.response;
 
+import com.nexusexchange.order.entity.OrderSide;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -12,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class OrderResponseDto {
     private Long id;
     private String symbol;
-    private String side;
-    private Double price;
-    private Double quantity;
+    private OrderSide side;
+    private BigDecimal price;
+    private Long quantity;
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class WalletUpdatedEvent extends BaseEvent {
     private Long walletId;
     private Long userId;
     private String currency;
-    private Double balance;
-    private Double amountChanged;
+    private BigDecimal balance;
+    private BigDecimal amountChanged;
     private String transactionType;
 }

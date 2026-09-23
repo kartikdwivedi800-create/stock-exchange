@@ -1,10 +1,12 @@
 package com.nexusexchange.common.event;
 
+import com.nexusexchange.common.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 
 @Data
 @SuperBuilder
@@ -12,7 +14,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public abstract class BaseEvent {
     private String eventId;
-    private String eventType;
-    private LocalDateTime timestamp;
+    private EventType eventType;
+    private Instant occurredAt;
+    private String correlationId;
     private String version;
 }
