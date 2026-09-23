@@ -10,11 +10,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public OrderResponseDto getOrder(Long id) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

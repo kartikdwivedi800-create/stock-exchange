@@ -39,7 +39,7 @@
 - [x] Delete `untitled/`; remove `connectivity-test-service` (NX-103)
 - [x] Root POM `dependencyManagement` / `pluginManagement` + Spring Cloud BOM (NX-104)
 - [x] user-service → `com.nexusexchange.user`, yml, actuator, springdoc, Dockerfile, README (NX-105)
-- [ ] Add common-library to every service; shared exception handler; `/api/v1` prefix (NX-106)
+- [x] Add common-library to every service; shared exception handler; `/api/v1` prefix (NX-106)
 - [x] `BigDecimal`/`long` everywhere; `OrderSide`; new `OrderStatus`; richer `BaseEvent` (NX-107)
 - [x] Env-var config, `.env.example`, profiles (NX-108)
 - [x] GitHub Actions `mvn verify` (NX-109)

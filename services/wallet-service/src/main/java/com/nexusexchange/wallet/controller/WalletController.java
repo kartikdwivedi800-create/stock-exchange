@@ -3,12 +3,13 @@ package com.nexusexchange.wallet.controller;
 import com.nexusexchange.wallet.dto.request.WalletRequestDto;
 import com.nexusexchange.wallet.dto.response.WalletResponseDto;
 import com.nexusexchange.wallet.service.WalletService;
+import com.nexusexchange.common.constants.ApiConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/wallets")
+@RequestMapping(ApiConstants.API_V1 + "/wallets")
 @RequiredArgsConstructor
 public class WalletController {
 

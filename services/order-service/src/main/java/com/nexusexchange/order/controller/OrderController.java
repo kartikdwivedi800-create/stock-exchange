@@ -3,12 +3,13 @@ package com.nexusexchange.order.controller;
 import com.nexusexchange.order.dto.request.OrderRequestDto;
 import com.nexusexchange.order.dto.response.OrderResponseDto;
 import com.nexusexchange.order.service.OrderService;
+import com.nexusexchange.common.constants.ApiConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping(ApiConstants.API_V1 + "/orders")
 @RequiredArgsConstructor
 public class OrderController {
 

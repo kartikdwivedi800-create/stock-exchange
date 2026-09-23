@@ -1,6 +1,6 @@
 package com.nexusexchange.order.dto.request;
 
-import com.nexusexchange.order.entity.OrderSide;
+import com.nexusexchange.common.enums.OrderSide;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
