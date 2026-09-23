@@ -18,6 +18,6 @@ public class OrderCancelledEvent extends BaseEvent {
     private Long userId;
     private String symbol;
     private String side;
-    private Double quantity;
+    private Long quantity;
     private String reason;
 }

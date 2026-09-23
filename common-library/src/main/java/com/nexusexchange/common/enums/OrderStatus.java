@@ -1,7 +1,8 @@
 package com.nexusexchange.common.enums;
 
 public enum OrderStatus {
-    PENDING,
+    NEW,
+    OPEN,
     PARTIALLY_FILLED,
     FILLED,
     CANCELLED,

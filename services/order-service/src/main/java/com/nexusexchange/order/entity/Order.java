@@ -1,6 +1,9 @@
 package com.nexusexchange.order.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -9,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "orders")
@@ -23,7 +28,12 @@ public class Order {
     private Long id;
 
     private String symbol;
-    private String side;
-    private Double price;
-    private Double quantity;
+
+    @Enumerated(EnumType.STRING)
+    private OrderSide side;
+
+    @Column(precision = 19, scale = 4)
+    private BigDecimal price;
+
+    private Long quantity;
 }

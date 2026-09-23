@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,6 +15,6 @@ public class PortfolioResponseDto {
     private Long id;
     private Long userId;
     private String symbol;
-    private Double quantity;
-    private Double averageBuyPrice;
+    private Long quantity;
+    private BigDecimal averageBuyPrice;
 }
