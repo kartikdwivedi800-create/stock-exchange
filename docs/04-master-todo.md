@@ -43,7 +43,7 @@
 - [x] `BigDecimal`/`long` everywhere; `OrderSide`; new `OrderStatus`; richer `BaseEvent` (NX-107)
 - [x] Env-var config, `.env.example`, profiles (NX-108)
 - [x] GitHub Actions `mvn verify` (NX-109)
-- [ ] Rewrite root README
+- [x] Rewrite root README
 
 ## 2. Design & build the schemas — Sprint 2
 - [ ] Kafka KRaft + Kafka UI + topic init job (NX-201)
