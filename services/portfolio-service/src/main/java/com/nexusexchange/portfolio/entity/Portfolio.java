@@ -1,5 +1,6 @@
 package com.nexusexchange.portfolio.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "portfolios")
@@ -24,6 +27,8 @@ public class Portfolio {
 
     private Long userId;
     private String symbol;
-    private Double quantity;
-    private Double averageBuyPrice;
+    private Long quantity;
+
+    @Column(precision = 19, scale = 4)
+    private BigDecimal averageBuyPrice;
 }
