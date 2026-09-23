@@ -1,10 +1,9 @@
 package com.nexusexchange.user.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nexusexchange.common.exception.UnauthorizedException;
 
-@ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class InvalidCredentialsException extends RuntimeException {
+/** Wrong username/email or password (HTTP 401 via the common handler). */
+public class InvalidCredentialsException extends UnauthorizedException {
     public InvalidCredentialsException(String message) {
         super(message);
     }

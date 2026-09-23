@@ -3,12 +3,13 @@ package com.nexusexchange.stock.controller;
 import com.nexusexchange.stock.dto.request.StockRequestDto;
 import com.nexusexchange.stock.dto.response.StockResponseDto;
 import com.nexusexchange.stock.service.StockService;
+import com.nexusexchange.common.constants.ApiConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/stocks")
+@RequestMapping(ApiConstants.API_V1 + "/stocks")
 @RequiredArgsConstructor
 public class StockController {
 

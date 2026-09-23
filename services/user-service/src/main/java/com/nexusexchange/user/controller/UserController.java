@@ -2,12 +2,13 @@ package com.nexusexchange.user.controller;
 
 import com.nexusexchange.user.dto.UserProfileDto;
 import com.nexusexchange.user.service.UserService;
+import com.nexusexchange.common.constants.ApiConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/profile")
+@RequestMapping(ApiConstants.API_V1 + "/users/me")
 @RequiredArgsConstructor
 public class UserController {
 

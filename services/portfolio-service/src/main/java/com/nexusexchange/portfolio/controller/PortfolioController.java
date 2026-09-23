@@ -3,12 +3,13 @@ package com.nexusexchange.portfolio.controller;
 import com.nexusexchange.portfolio.dto.request.PortfolioRequestDto;
 import com.nexusexchange.portfolio.dto.response.PortfolioResponseDto;
 import com.nexusexchange.portfolio.service.PortfolioService;
+import com.nexusexchange.common.constants.ApiConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/portfolios")
+@RequestMapping(ApiConstants.API_V1 + "/portfolios")
 @RequiredArgsConstructor
 public class PortfolioController {
 

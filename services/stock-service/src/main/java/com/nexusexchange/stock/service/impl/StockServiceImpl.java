@@ -10,11 +10,11 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public StockResponseDto createStock(StockRequestDto requestDto) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public StockResponseDto getStock(Long id) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

@@ -7,7 +7,7 @@ import com.nexusexchange.user.dto.UserProfileDto;
 import com.nexusexchange.user.entity.Role;
 import com.nexusexchange.user.entity.User;
 import com.nexusexchange.user.exception.InvalidCredentialsException;
-import com.nexusexchange.user.exception.ResourceNotFoundException;
+import com.nexusexchange.common.exception.ResourceNotFoundException;
 import com.nexusexchange.user.exception.UserAlreadyExistsException;
 import com.nexusexchange.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

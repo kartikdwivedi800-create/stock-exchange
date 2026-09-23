@@ -1,10 +1,9 @@
 package com.nexusexchange.user.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nexusexchange.common.exception.ConflictException;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class UserAlreadyExistsException extends RuntimeException {
+/** Username or email already registered (HTTP 409 via the common handler). */
+public class UserAlreadyExistsException extends ConflictException {
     public UserAlreadyExistsException(String message) {
         super(message);
     }

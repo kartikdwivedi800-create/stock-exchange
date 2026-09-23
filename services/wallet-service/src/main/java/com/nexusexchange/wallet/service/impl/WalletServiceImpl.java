@@ -10,11 +10,11 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public WalletResponseDto createWallet(WalletRequestDto requestDto) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public WalletResponseDto getWallet(Long id) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

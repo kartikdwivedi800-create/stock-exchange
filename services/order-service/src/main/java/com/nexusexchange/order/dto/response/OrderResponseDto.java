@@ -1,6 +1,6 @@
 package com.nexusexchange.order.dto.response;
 
-import com.nexusexchange.order.entity.OrderSide;
+import com.nexusexchange.common.enums.OrderSide;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
