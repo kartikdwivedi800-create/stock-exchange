@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,8 +24,8 @@ public class PortfolioRequestDto {
     private String symbol;
 
     @PositiveOrZero(message = "Quantity must be zero or positive")
-    private Double quantity;
+    private Long quantity;
 
     @Positive(message = "Average buy price must be positive")
-    private Double averageBuyPrice;
+    private BigDecimal averageBuyPrice;
 }
