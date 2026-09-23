@@ -1,0 +1,36 @@
+# ---- Build output ----
+target/
+out/
+build/
+*.class
+*.log
+logs/
+
+# ---- IDEs ----
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.sts4-cache
+
+# ---- Maven wrapper (downloaded on demand) ----
+.mvn/wrapper/maven-wrapper.jar
+
+# ---- Local config & secrets ----
+.env
+*.env.local
+application-local.yml
+
+# ---- Data (raw datasets are large; only derived seed files are committed) ----
+tools/seed-data/raw/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
