@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -18,7 +20,7 @@ public class OrderPlacedEvent extends BaseEvent {
     private Long userId;
     private String symbol;
     private String side;
-    private Double price;
-    private Double quantity;
+    private BigDecimal price;
+    private Long quantity;
     private String orderType;
 }

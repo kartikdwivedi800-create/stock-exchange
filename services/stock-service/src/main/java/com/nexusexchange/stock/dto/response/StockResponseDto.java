@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,5 +15,5 @@ public class StockResponseDto {
     private Long id;
     private String symbol;
     private String companyName;
-    private Double price;
+    private BigDecimal price;
 }

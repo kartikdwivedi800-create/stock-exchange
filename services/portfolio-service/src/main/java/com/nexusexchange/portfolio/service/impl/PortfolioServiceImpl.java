@@ -10,11 +10,11 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     @Override
     public PortfolioResponseDto createPortfolio(PortfolioRequestDto requestDto) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     public PortfolioResponseDto getPortfolio(Long id) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

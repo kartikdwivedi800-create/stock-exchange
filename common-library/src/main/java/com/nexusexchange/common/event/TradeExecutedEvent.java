@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,7 +21,7 @@ public class TradeExecutedEvent extends BaseEvent {
     private Long buyOrderId;
     private Long sellOrderId;
     private String symbol;
-    private Double price;
-    private Double quantity;
+    private BigDecimal price;
+    private Long quantity;
     private LocalDateTime executionTime;
 }

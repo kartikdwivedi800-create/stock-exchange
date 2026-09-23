@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,5 +19,5 @@ public class WalletRequestDto {
     private String currency;
 
     @PositiveOrZero(message = "Balance must be zero or positive")
-    private Double balance;
+    private BigDecimal balance;
 }
