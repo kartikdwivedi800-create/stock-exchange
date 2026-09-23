@@ -37,7 +37,7 @@
 ## 1. Fix the foundation — Sprint 1
 - [x] Root `.gitignore` + `.gitattributes`; untrack `target/` and `.idea/`; renormalise line endings (NX-102)
 - [x] Delete `untitled/`; remove `connectivity-test-service` (NX-103)
-- [ ] Root POM `dependencyManagement` / `pluginManagement` + Spring Cloud BOM (NX-104)
+- [x] Root POM `dependencyManagement` / `pluginManagement` + Spring Cloud BOM (NX-104)
 - [ ] user-service → `com.nexusexchange.user`, yml, actuator, springdoc, Dockerfile, README (NX-105)
 - [ ] Add common-library to every service; shared exception handler; `/api/v1` prefix (NX-106)
 - [x] `BigDecimal`/`long` everywhere; `OrderSide`; new `OrderStatus`; richer `BaseEvent` (NX-107)
