@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -15,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class StockPriceUpdatedEvent extends BaseEvent {
     private String symbol;
-    private Double oldPrice;
-    private Double newPrice;
-    private Double percentageChange;
+    private BigDecimal oldPrice;
+    private BigDecimal newPrice;
+    private BigDecimal percentageChange;
 }
