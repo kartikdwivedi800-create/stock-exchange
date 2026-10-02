@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+import com.nexusexchange.common.enums.UserStatus;
+
+import java.time.Instant;
 
 @Data
 @Builder
@@ -20,6 +22,7 @@ public class UserProfileDto {
     private String lastName;
     private String phoneNumber;
     private Role role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private UserStatus status;
+    private Instant createdAt;
+    private Instant updatedAt;
 }
