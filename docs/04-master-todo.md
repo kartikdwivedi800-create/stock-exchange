@@ -50,7 +50,7 @@
 - [x] Postgres init script: 7 databases (NX-202)
 - [x] Flyway in every service, `ddl-auto: validate` (NX-203)
 - [x] user_db schema (NX-204)
-- [ ] wallet_db schema + entities (NX-205)
+- [x] wallet_db schema + entities (NX-205)
 - [ ] stock_db schema + seed 20 stocks (NX-206)
 - [ ] order_db + matching_db schemas (NX-207)
 - [ ] portfolio_db + notification_db schemas (NX-208)
