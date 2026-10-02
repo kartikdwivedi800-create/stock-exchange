@@ -13,8 +13,9 @@ public class WalletMapper {
             return null;
         }
         return Wallet.builder()
-                .currency(requestDto.getCurrency())
-                .balance(requestDto.getBalance())
+                .userId(requestDto.getUserId())
+                .currency(requestDto.getCurrency() != null ? requestDto.getCurrency() : "INR")
+                .availableBalance(requestDto.getAvailableBalance())
                 .build();
     }
 
@@ -24,8 +25,10 @@ public class WalletMapper {
         }
         return WalletResponseDto.builder()
                 .id(wallet.getId())
+                .userId(wallet.getUserId())
                 .currency(wallet.getCurrency())
-                .balance(wallet.getBalance())
+                .availableBalance(wallet.getAvailableBalance())
+                .reservedBalance(wallet.getReservedBalance())
                 .build();
     }
 }
