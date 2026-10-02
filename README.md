@@ -34,7 +34,7 @@ All REST routes are under `/api/v1`. Each service also exposes `/health`, `/actu
 **Prerequisites:** JDK 21 (the build targets Java 21; newer JDKs compile but tests may behave differently), Docker Desktop.
 
 ```bash
-# 1. Start infrastructure (PostgreSQL, Kafka, Redis)
+# 1. Start infrastructure (PostgreSQL, Kafka in KRaft mode + topics, Redis, Kafka UI on http://localhost:8090)
 docker compose up -d
 
 # 2. Optional: copy the example environment file and adjust values
