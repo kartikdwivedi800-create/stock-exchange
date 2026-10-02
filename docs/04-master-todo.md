@@ -46,7 +46,7 @@
 - [x] Rewrite root README
 
 ## 2. Design & build the schemas — Sprint 2
-- [ ] Kafka KRaft + Kafka UI + topic init job (NX-201)
+- [x] Kafka KRaft + Kafka UI + topic init job (NX-201)
 - [ ] Postgres init script: 7 databases (NX-202)
 - [ ] Flyway in every service, `ddl-auto: validate` (NX-203)
 - [ ] user_db schema (NX-204)
