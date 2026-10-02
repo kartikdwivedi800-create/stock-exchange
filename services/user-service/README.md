@@ -19,7 +19,7 @@ Registration, login and user profiles for Nexus Exchange.
 > Errors use the shared `ErrorResponse` from common-library. Passwords and tokens are still mocks until Sprint 3 (NX-301/302).
 
 ## Configuration
-Environment variables (defaults in brackets): `DB_URL` (`jdbc:postgresql://localhost:5432/app`), `DB_USERNAME` (`postgres`), `DB_PASSWORD` (`postgres`), `SERVER_PORT` (`8081`). Profile `docker` points the database at host `postgres`.
+Environment variables (defaults in brackets): `DB_HOST` (`localhost`), `DB_PORT` (`5432`), `DB_NAME` (`user_db`), `DB_USERNAME` (`user_service`), `DB_PASSWORD` (`user_service`), `SERVER_PORT` (`8081`). Profile `docker` points the database at host `postgres`.
 
 ## Tests
 `UserServiceApplicationTests` runs against a Testcontainers PostgreSQL and is skipped when Docker is not running. `UserServiceTests` are plain unit tests.

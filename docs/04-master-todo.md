@@ -47,7 +47,7 @@
 
 ## 2. Design & build the schemas — Sprint 2
 - [x] Kafka KRaft + Kafka UI + topic init job (NX-201)
-- [ ] Postgres init script: 7 databases (NX-202)
+- [x] Postgres init script: 7 databases (NX-202)
 - [ ] Flyway in every service, `ddl-auto: validate` (NX-203)
 - [ ] user_db schema (NX-204)
 - [ ] wallet_db schema + entities (NX-205)
