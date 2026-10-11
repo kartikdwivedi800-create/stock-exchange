@@ -15,7 +15,9 @@ public class StockMapper {
         return Stock.builder()
                 .symbol(requestDto.getSymbol())
                 .companyName(requestDto.getCompanyName())
-                .price(requestDto.getPrice())
+                .sector(requestDto.getSector())
+                .tickSize(requestDto.getTickSize())
+                .lotSize(requestDto.getLotSize())
                 .build();
     }
 
@@ -27,7 +29,17 @@ public class StockMapper {
                 .id(stock.getId())
                 .symbol(stock.getSymbol())
                 .companyName(stock.getCompanyName())
-                .price(stock.getPrice())
+                .exchange(stock.getExchange())
+                .sector(stock.getSector())
+                .tickSize(stock.getTickSize())
+                .lotSize(stock.getLotSize())
+                .lastPrice(stock.getLastPrice())
+                .previousClose(stock.getPreviousClose())
+                .dayOpen(stock.getDayOpen())
+                .dayHigh(stock.getDayHigh())
+                .dayLow(stock.getDayLow())
+                .dayVolume(stock.getDayVolume())
+                .tradingStatus(stock.getTradingStatus())
                 .build();
     }
 }
