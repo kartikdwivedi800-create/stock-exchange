@@ -3,7 +3,9 @@ package com.nexusexchange.wallet.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -13,7 +15,9 @@ import java.time.temporal.ChronoUnit;
 /** Mirrors table {@code wallets} (migration V2). One row per registered user. */
 @Entity
 @Table(name = "wallets")
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

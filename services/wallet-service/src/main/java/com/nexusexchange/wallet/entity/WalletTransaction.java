@@ -4,7 +4,9 @@ import com.nexusexchange.common.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -14,7 +16,9 @@ import java.time.temporal.ChronoUnit;
 /** Mirrors table {@code wallet_transactions} (migration V2). Append-only ledger row per balance movement. */
 @Entity
 @Table(name = "wallet_transactions")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"wallet"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
