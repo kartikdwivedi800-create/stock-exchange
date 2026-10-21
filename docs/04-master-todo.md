@@ -52,7 +52,7 @@
 - [x] user_db schema (NX-204)
 - [x] wallet_db schema + entities (NX-205)
 - [x] stock_db schema + seed 20 stocks (NX-206)
-- [ ] order_db + matching_db schemas (NX-207)
+- [x] order_db schema (matching tables moved to NX-904) (NX-207)
 - [ ] portfolio_db + notification_db schemas (NX-208)
 - [ ] Testcontainers base module (NX-209)
 
