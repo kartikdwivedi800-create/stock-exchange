@@ -16,5 +16,7 @@ public class PortfolioResponseDto {
     private Long userId;
     private String symbol;
     private Long quantity;
+    private Long reservedQuantity;
     private BigDecimal averageBuyPrice;
+    private BigDecimal realizedPnl;
 }

@@ -2,34 +2,38 @@ package com.nexusexchange.portfolio.mapper;
 
 import com.nexusexchange.portfolio.dto.request.PortfolioRequestDto;
 import com.nexusexchange.portfolio.dto.response.PortfolioResponseDto;
-import com.nexusexchange.portfolio.entity.Portfolio;
+import com.nexusexchange.portfolio.entity.Holding;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PortfolioMapper {
 
-    public Portfolio toEntity(PortfolioRequestDto requestDto) {
+    public Holding toEntity(PortfolioRequestDto requestDto) {
         if (requestDto == null) {
             return null;
         }
-        return Portfolio.builder()
+        return Holding.builder()
                 .userId(requestDto.getUserId())
                 .symbol(requestDto.getSymbol())
                 .quantity(requestDto.getQuantity())
+                .reservedQuantity(requestDto.getReservedQuantity())
                 .averageBuyPrice(requestDto.getAverageBuyPrice())
+                .realizedPnl(requestDto.getRealizedPnl())
                 .build();
     }
 
-    public PortfolioResponseDto toResponseDto(Portfolio portfolio) {
-        if (portfolio == null) {
+    public PortfolioResponseDto toResponseDto(Holding holding) {
+        if (holding == null) {
             return null;
         }
         return PortfolioResponseDto.builder()
-                .id(portfolio.getId())
-                .userId(portfolio.getUserId())
-                .symbol(portfolio.getSymbol())
-                .quantity(portfolio.getQuantity())
-                .averageBuyPrice(portfolio.getAverageBuyPrice())
+                .id(holding.getId())
+                .userId(holding.getUserId())
+                .symbol(holding.getSymbol())
+                .quantity(holding.getQuantity())
+                .reservedQuantity(holding.getReservedQuantity())
+                .averageBuyPrice(holding.getAverageBuyPrice())
+                .realizedPnl(holding.getRealizedPnl())
                 .build();
     }
 }
