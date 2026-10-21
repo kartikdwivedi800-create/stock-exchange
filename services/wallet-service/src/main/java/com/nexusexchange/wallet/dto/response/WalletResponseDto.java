@@ -12,7 +12,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WalletResponseDto {
+
     private Long id;
+    private Long userId;
     private String currency;
-    private BigDecimal balance;
+    private BigDecimal availableBalance;
+    private BigDecimal reservedBalance;
 }

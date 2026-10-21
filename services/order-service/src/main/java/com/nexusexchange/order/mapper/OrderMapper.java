@@ -15,8 +15,10 @@ public class OrderMapper {
         return Order.builder()
                 .symbol(requestDto.getSymbol())
                 .side(requestDto.getSide())
+                .orderType(requestDto.getOrderType())
                 .price(requestDto.getPrice())
                 .quantity(requestDto.getQuantity())
+                .clientOrderId(requestDto.getClientOrderId())
                 .build();
     }
 
@@ -28,8 +30,14 @@ public class OrderMapper {
                 .id(order.getId())
                 .symbol(order.getSymbol())
                 .side(order.getSide())
+                .orderType(order.getOrderType())
                 .price(order.getPrice())
                 .quantity(order.getQuantity())
+                .status(order.getStatus())
+                .filledQuantity(order.getFilledQuantity())
+                .avgFillPrice(order.getAvgFillPrice())
+                .rejectionReason(order.getRejectionReason())
+                .createdAt(order.getCreatedAt())
                 .build();
     }
 }

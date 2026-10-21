@@ -1,7 +1,7 @@
 package com.nexusexchange.wallet.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +15,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class WalletRequestDto {
 
-    @NotBlank(message = "Currency is required")
+    @NotNull(message = "userId is required")
+    private Long userId;
+
+    /** ISO-4217 currency code; defaults to INR when not supplied. */
     private String currency;
 
-    @PositiveOrZero(message = "Balance must be zero or positive")
-    private BigDecimal balance;
+    @Positive(message = "Initial deposit amount must be positive")
+    private BigDecimal availableBalance;
 }

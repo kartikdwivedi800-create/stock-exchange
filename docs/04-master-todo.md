@@ -46,15 +46,15 @@
 - [x] Rewrite root README
 
 ## 2. Design & build the schemas — Sprint 2
-- [ ] Kafka KRaft + Kafka UI + topic init job (NX-201)
-- [ ] Postgres init script: 7 databases (NX-202)
-- [ ] Flyway in every service, `ddl-auto: validate` (NX-203)
-- [ ] user_db schema (NX-204)
-- [ ] wallet_db schema + entities (NX-205)
-- [ ] stock_db schema + seed 20 stocks (NX-206)
-- [ ] order_db + matching_db schemas (NX-207)
-- [ ] portfolio_db + notification_db schemas (NX-208)
-- [ ] Testcontainers base module (NX-209)
+- [x] Kafka KRaft + Kafka UI + topic init job (NX-201)
+- [x] Postgres init script: 7 databases (NX-202)
+- [x] Flyway in every service, `ddl-auto: validate` (NX-203)
+- [x] user_db schema (NX-204)
+- [x] wallet_db schema + entities (NX-205)
+- [x] stock_db schema + seed 20 stocks (NX-206)
+- [x] order_db schema (matching tables moved to NX-904) (NX-207)
+- [x] portfolio_db schema (notifications table moved to NX-1201) (NX-208)
+- [x] Testcontainers base module + repository tests in every service (NX-209)
 
 ## 3. Identity & security — Sprint 3
 - [ ] BCrypt (NX-301)

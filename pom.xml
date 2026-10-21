@@ -35,6 +35,7 @@
 
     <modules>
         <module>common-library</module>
+        <module>test-support</module>
         <module>services/user-service</module>
         <module>services/wallet-service</module>
         <module>services/order-service</module>
@@ -56,6 +57,13 @@
                 <groupId>com.nexusexchange</groupId>
                 <artifactId>common-library</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.nexusexchange</groupId>
+                <artifactId>test-support</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -122,6 +130,15 @@
                             <arg>-Amapstruct.defaultComponentModel=spring</arg>
                             <arg>-Amapstruct.unmappedTargetPolicy=ERROR</arg>
                         </compilerArgs>
+                    </configuration>
+                </plugin>
+
+                <!-- Tests run in UTC, like the services (see *Application.main) -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <argLine>-Duser.timezone=UTC</argLine>
                     </configuration>
                 </plugin>
 

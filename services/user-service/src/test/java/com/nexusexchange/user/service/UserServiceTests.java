@@ -63,8 +63,8 @@ public class UserServiceTests {
 
     @Test
     void registerUser_Success() {
-        when(userRepository.existsByUsername(any())).thenReturn(false);
-        when(userRepository.existsByEmail(any())).thenReturn(false);
+        when(userRepository.existsByUsernameIgnoreCase(any())).thenReturn(false);
+        when(userRepository.existsByEmailIgnoreCase(any())).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
 
         UserProfileDto result = userService.registerUser(registrationDto);
@@ -77,7 +77,7 @@ public class UserServiceTests {
 
     @Test
     void registerUser_UsernameExists_ThrowsException() {
-        when(userRepository.existsByUsername(any())).thenReturn(true);
+        when(userRepository.existsByUsernameIgnoreCase(any())).thenReturn(true);
 
         assertThrows(UserAlreadyExistsException.class, () -> userService.registerUser(registrationDto));
         verify(userRepository, never()).save(any(User.class));
@@ -85,7 +85,7 @@ public class UserServiceTests {
 
     @Test
     void loginUser_Success() {
-        when(userRepository.findByUsername("john_doe")).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByUsernameIgnoreCase("john_doe")).thenReturn(Optional.of(mockUser));
 
         AuthResponseDto result = userService.loginUser(loginDto);
 
@@ -96,7 +96,7 @@ public class UserServiceTests {
 
     @Test
     void loginUser_InvalidPassword_ThrowsException() {
-        when(userRepository.findByUsername("john_doe")).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByUsernameIgnoreCase("john_doe")).thenReturn(Optional.of(mockUser));
         loginDto.setPassword("wrongpassword");
 
         assertThrows(InvalidCredentialsException.class, () -> userService.loginUser(loginDto));

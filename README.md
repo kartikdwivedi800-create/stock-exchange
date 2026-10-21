@@ -34,7 +34,7 @@ All REST routes are under `/api/v1`. Each service also exposes `/health`, `/actu
 **Prerequisites:** JDK 21 (the build targets Java 21; newer JDKs compile but tests may behave differently), Docker Desktop.
 
 ```bash
-# 1. Start infrastructure (PostgreSQL, Kafka, Redis)
+# 1. Start infrastructure (PostgreSQL, Kafka in KRaft mode + topics, Redis, Kafka UI on http://localhost:8090)
 docker compose up -d
 
 # 2. Optional: copy the example environment file and adjust values
@@ -55,7 +55,7 @@ curl -X POST http://localhost:8081/api/v1/auth/register \
   -d '{"username":"kartik","email":"kartik@example.com","password":"Secret123!","firstName":"Kartik","lastName":"D"}'
 ```
 
-Configuration comes from environment variables with local defaults (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `SERVER_PORT`, …). See [.env.example](.env.example). The `docker` Spring profile points services at the compose hostnames.
+Each service has its own database (`user_db`, `wallet_db`, …) and login role, created by `infra/postgres/init/01-databases.sql` the first time Postgres starts with an empty volume. Configuration comes from environment variables with local defaults (`DB_HOST`, `DB_PORT`, `KAFKA_BOOTSTRAP_SERVERS`, …). See [.env.example](.env.example). The `docker` Spring profile points services at the compose hostnames.
 
 > Tests that need a real database use Testcontainers. They are skipped automatically when Docker is not running.
 

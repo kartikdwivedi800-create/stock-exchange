@@ -26,10 +26,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserProfileDto registerUser(UserRegistrationDto registrationDto) {
-        if (userRepository.existsByUsername(registrationDto.getUsername())) {
+        if (userRepository.existsByUsernameIgnoreCase(registrationDto.getUsername())) {
             throw new UserAlreadyExistsException("Username is already taken");
         }
-        if (userRepository.existsByEmail(registrationDto.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(registrationDto.getEmail())) {
             throw new UserAlreadyExistsException("Email is already registered");
         }
 
@@ -53,9 +53,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public AuthResponseDto loginUser(UserLoginDto loginDto) {
-        Optional<User> userOpt = userRepository.findByUsername(loginDto.getUsernameOrEmail());
+        Optional<User> userOpt = userRepository.findByUsernameIgnoreCase(loginDto.getUsernameOrEmail());
         if (userOpt.isEmpty()) {
-            userOpt = userRepository.findByEmail(loginDto.getUsernameOrEmail());
+            userOpt = userRepository.findByEmailIgnoreCase(loginDto.getUsernameOrEmail());
         }
 
         if (userOpt.isEmpty()) {
@@ -109,6 +109,7 @@ public class UserServiceImpl implements UserService {
                 .lastName(user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
+                .status(user.getStatus())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
