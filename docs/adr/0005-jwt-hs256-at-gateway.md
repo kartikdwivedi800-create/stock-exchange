@@ -1,6 +1,6 @@
 # ADR-0005: JWT signed with HS256, issued by user-service and validated at the gateway
 
-- **Status:** Accepted
+- **Status:** Accepted, amended by [ADR-0012](0012-jwt-validated-by-every-service.md) (services validate JWTs too; Spring Security instead of jjwt)
 - **Date:** 2026-09-24
 - **Decider:** Kartik
 

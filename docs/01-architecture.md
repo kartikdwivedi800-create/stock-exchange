@@ -116,7 +116,7 @@ Placing an order uses **synchronous reservation** so the user gets an immediate 
 
 - user-service issues a JWT with `sub=userId`, `role` and `jti`. Refresh tokens are stored hashed in `refresh_tokens`, rotated on each use and revocable.
 - The gateway validates the JWT, **strips any client-supplied `X-User-*` headers**, then injects `X-User-Id`, `X-User-Role` and `X-Request-Id`.
-- Downstream services trust these headers only from the internal network. `/internal/**` endpoints are not routed by the gateway.
+- Every service **also validates the JWT itself** (Spring Security resource server) and takes the user id from the token's `sub` claim, never from a header (ADR-0012). `/internal/**` endpoints are not routed by the gateway.
 - Admin-only endpoints (`/api/v1/admin/**`) require `ROLE_ADMIN`.
 - Rate limit: Redis token bucket, e.g. 20 orders/sec per user.
 

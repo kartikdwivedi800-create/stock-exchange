@@ -7,6 +7,7 @@
 | [03-roadmap-and-sprints.md](03-roadmap-and-sprints.md) | 6 phases, 15 one-week sprints, stories with acceptance criteria |
 | [adr/](adr/README.md) | Architecture Decision Records: why each tech-stack choice was made |
 | [diagrams/](diagrams/) | SVG diagrams used in the architecture doc |
+| [sprints/](sprints/) | Detailed per-sprint specs (Sprint 3 onwards): flows, story descriptions, hints, tests |
 | [04-master-todo.md](04-master-todo.md) | A single ordered checklist to work through, top to bottom |
 
 The older PDFs (`Stock_Exchange_Simulator_Architecture.pdf`, `Sprint0_Planning_Stock_Exchange.pdf`) are kept for history. The Markdown docs above supersede them.
