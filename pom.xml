@@ -35,6 +35,7 @@
 
     <modules>
         <module>common-library</module>
+        <module>test-support</module>
         <module>services/user-service</module>
         <module>services/wallet-service</module>
         <module>services/order-service</module>
@@ -56,6 +57,13 @@
                 <groupId>com.nexusexchange</groupId>
                 <artifactId>common-library</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.nexusexchange</groupId>
+                <artifactId>test-support</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
