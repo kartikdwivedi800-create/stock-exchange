@@ -54,7 +54,7 @@
 - [x] stock_db schema + seed 20 stocks (NX-206)
 - [x] order_db schema (matching tables moved to NX-904) (NX-207)
 - [x] portfolio_db schema (notifications table moved to NX-1201) (NX-208)
-- [ ] Testcontainers base module (NX-209)
+- [x] Testcontainers base module + repository tests in every service (NX-209)
 
 ## 3. Identity & security — Sprint 3
 - [ ] BCrypt (NX-301)
