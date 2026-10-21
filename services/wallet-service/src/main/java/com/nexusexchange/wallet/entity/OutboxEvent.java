@@ -3,7 +3,9 @@ package com.nexusexchange.wallet.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -15,7 +17,9 @@ import java.util.UUID;
 /** Mirrors table {@code outbox} (migration V2). Written in the same transaction as the domain change; a poller publishes to Kafka. */
 @Entity
 @Table(name = "outbox")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"payload"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

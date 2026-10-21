@@ -3,7 +3,9 @@ package com.nexusexchange.wallet.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
@@ -13,7 +15,9 @@ import java.util.UUID;
 /** Mirrors table {@code processed_events} (migration V2). Guards Kafka consumers against duplicate delivery. */
 @Entity
 @Table(name = "processed_events")
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

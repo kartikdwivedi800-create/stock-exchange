@@ -3,7 +3,9 @@ package com.nexusexchange.wallet.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -13,7 +15,9 @@ import java.time.temporal.ChronoUnit;
 /** Mirrors table {@code fund_reservations} (migration V2). One row per BUY order locking funds. */
 @Entity
 @Table(name = "fund_reservations")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"wallet"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

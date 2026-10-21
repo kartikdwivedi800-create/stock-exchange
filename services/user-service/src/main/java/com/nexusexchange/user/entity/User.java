@@ -4,7 +4,9 @@ import com.nexusexchange.common.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
@@ -13,7 +15,9 @@ import java.time.temporal.ChronoUnit;
 /** Mirrors table `users` (migrations V1, V2). */
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"passwordHash"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

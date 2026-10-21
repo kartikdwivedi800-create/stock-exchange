@@ -3,7 +3,9 @@ package com.nexusexchange.user.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
@@ -15,7 +17,9 @@ import java.time.temporal.ChronoUnit;
  */
 @Entity
 @Table(name = "refresh_tokens")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"user", "tokenHash"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
