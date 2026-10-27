@@ -1,5 +1,7 @@
 package com.nexusexchange.user.controller;
 
+import com.nexusexchange.user.config.JsonAccessDeniedHandler;
+import com.nexusexchange.user.config.JsonAuthenticationEntryPoint;
 import com.nexusexchange.user.config.SecurityConfig;
 import com.nexusexchange.user.exception.InvalidCredentialsException;
 import com.nexusexchange.user.exception.UserAlreadyExistsException;
@@ -12,12 +14,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * is picked up automatically (no handler exists in user-service itself).
  */
 @WebMvcTest(controllers = {AuthController.class, UserController.class})
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JsonAuthenticationEntryPoint.class, JsonAccessDeniedHandler.class})
 class AuthControllerTest {
 
     private static final String VALID_REGISTRATION = """
@@ -69,14 +74,44 @@ class AuthControllerTest {
     }
 
     @Test
-    void profileWithoutUserHeaderReturns400() throws Exception {
+    void profileWithoutTokenReturns401Json() throws Exception {
         mvc.perform(get("/api/v1/users/me"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.path").exists())
+                .andExpect(jsonPath("$.requestId").exists());
+    }
+
+    @Test
+    void responseNeverSetsSessionCookie() throws Exception {
+        mvc.perform(get("/api/v1/users/me"))
+                .andExpect(result -> org.assertj.core.api.Assertions
+                        .assertThat(result.getResponse().getCookie("JSESSIONID")).isNull())
+                .andExpect(result -> org.assertj.core.api.Assertions
+                        .assertThat(result.getResponse().getHeaders("Set-Cookie")).isEmpty());
+        mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content(VALID_REGISTRATION))
+                .andExpect(result -> org.assertj.core.api.Assertions
+                        .assertThat(result.getResponse().getCookie("JSESSIONID")).isNull());
+    }
+
+    @Test
+    void registerIsPublic() throws Exception {
+        mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content(VALID_REGISTRATION))
+                .andExpect(result -> org.assertj.core.api.Assertions
+                        .assertThat(result.getResponse().getStatus()).isNotEqualTo(401));
+    }
+
+    @Test
+    void adminEndpointWithoutTokenReturns401() throws Exception {
+        mvc.perform(get("/api/v1/admin/users"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void oldUnprefixedRouteIsGone() throws Exception {
-        mvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON).content(VALID_REGISTRATION))
+        // Authenticated, so security lets the request through and the missing mapping shows as 404
+        mvc.perform(post("/register").with(user("someone")).contentType(MediaType.APPLICATION_JSON).content(VALID_REGISTRATION))
                 .andExpect(status().isNotFound());
     }
 
@@ -108,7 +143,7 @@ class AuthControllerTest {
 
     @Test
     void authEndpointsAreOpenWithoutLogin() throws Exception {
-        // Until NX-304 the chain must permit all: no 401 and no Basic-auth challenge header
+        // Public auth routes: no 401 and no Basic-auth challenge header
         when(userService.loginUser(any())).thenThrow(new InvalidCredentialsException("Invalid username/email or password"));
 
         mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
