@@ -13,6 +13,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.BadJwtException;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import com.nexusexchange.user.dto.AuthResponseDto;
+import com.nexusexchange.user.dto.UserProfileDto;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
@@ -44,6 +51,56 @@ class AuthControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    /** Needed by oauth2ResourceServer(jwt); the real decoder is covered by JwtConfigTest. */
+    @MockitoBean
+    private JwtDecoder jwtDecoder;
+
+    @Test
+    void loginReturnsAccessTokenResponseShape() throws Exception {
+        when(userService.loginUser(any())).thenReturn(AuthResponseDto.builder()
+                .accessToken("header.payload.signature")
+                .expiresIn(900)
+                .user(UserProfileDto.builder().id(1L).username("kartik").build())
+                .build());
+
+        mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"usernameOrEmail\":\"kartik\",\"password\":\"Secret123!\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("header.payload.signature"))
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.expiresIn").value(900))
+                .andExpect(jsonPath("$.refreshToken").doesNotExist())
+                .andExpect(jsonPath("$.token").doesNotExist())
+                .andExpect(jsonPath("$.user.username").value("kartik"));
+    }
+
+    @Test
+    void validJwtOnAuthenticatedEndpointIsNot401() throws Exception {
+        mvc.perform(get("/api/v1/users/me").with(jwt().jwt(j -> j.subject("42"))))
+                .andExpect(result -> org.assertj.core.api.Assertions
+                        .assertThat(result.getResponse().getStatus()).isNotEqualTo(401));
+    }
+
+    @Test
+    void invalidBearerTokenReturns401Json() throws Exception {
+        when(jwtDecoder.decode(any())).thenThrow(new BadJwtException("bad token"));
+
+        mvc.perform(get("/api/v1/users/me").header("Authorization", "Bearer not-a-valid-token"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.path").value("/api/v1/users/me"));
+    }
+
+    @Test
+    void userRoleOnAdminEndpointReturns403Json() throws Exception {
+        mvc.perform(get("/api/v1/admin/users")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(403));
+    }
 
     @Test
     void duplicateUserReturns409FromSharedHandler() throws Exception {

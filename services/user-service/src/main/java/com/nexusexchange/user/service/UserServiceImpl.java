@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final TokenService tokenService;
 
     @Override
     @Transactional
@@ -69,11 +70,9 @@ public class UserServiceImpl implements UserService {
         if(!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
             throw new InvalidCredentialsException("Invalid username/email or password");
         }
-        // Generate a mock JWT for the skeleton
-        String mockJwtToken = "mock-jwt-token-for-" + user.getUsername() + "-" + UUID.randomUUID();
-
         return AuthResponseDto.builder()
-                .token(mockJwtToken)
+                .accessToken(tokenService.createAccessToken(user))
+                .expiresIn(tokenService.accessTokenExpiresInSeconds())
                 .user(mapToProfileDto(user))
                 .build();
     }

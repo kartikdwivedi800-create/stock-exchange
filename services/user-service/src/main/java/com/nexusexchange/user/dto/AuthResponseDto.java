@@ -11,10 +11,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthResponseDto {
 
-    private String token;
-    
+    private String accessToken;
+
     @Builder.Default
     private String tokenType = "Bearer";
-    
+
+    /** Access-token lifetime in seconds. */
+    private long expiresIn;
+
+    /** Filled in by NX-303; null until then. */
+    private String refreshToken;
+
     private UserProfileDto user;
 }

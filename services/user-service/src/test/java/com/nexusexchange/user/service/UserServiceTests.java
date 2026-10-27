@@ -9,6 +9,7 @@ import com.nexusexchange.user.entity.User;
 import com.nexusexchange.user.exception.InvalidCredentialsException;
 import com.nexusexchange.user.exception.UserAlreadyExistsException;
 import com.nexusexchange.user.repository.UserRepository;
+import com.nexusexchange.user.config.JwtTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +47,9 @@ class UserServiceTests {
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userRepository, passwordEncoder);
+        TokenService tokenService = new TokenService(JwtTestSupport.encoder(), JwtTestSupport.properties(),
+                JwtTestSupport.clockAt(java.time.Instant.now()));
+        userService = new UserServiceImpl(userRepository, passwordEncoder, tokenService);
 
         registrationDto = UserRegistrationDto.builder()
                 .username("john_doe")
@@ -153,7 +156,11 @@ class UserServiceTests {
 
         AuthResponseDto result = userService.loginUser(loginDto);
 
-        assertThat(result.getToken()).isNotBlank();
+        assertThat(result.getAccessToken()).isNotBlank();
+        assertThat(result.getAccessToken().split("\\.")).hasSize(3);
+        assertThat(result.getTokenType()).isEqualTo("Bearer");
+        assertThat(result.getExpiresIn()).isEqualTo(900L);
+        assertThat(result.getRefreshToken()).isNull();
         assertThat(result.getUser().getUsername()).isEqualTo("john_doe");
     }
 

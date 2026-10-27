@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -18,10 +20,23 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
+    /** Turns the {@code role} claim (already "ROLE_USER" / "ROLE_ADMIN") into the authority, with no extra prefix. */
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
+        authorities.setAuthoritiesClaimName("role");
+        authorities.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authorities);
+        return converter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JsonAuthenticationEntryPoint authenticationEntryPoint,
-                                                   JsonAccessDeniedHandler accessDeniedHandler) throws Exception {
+                                                   JsonAccessDeniedHandler accessDeniedHandler,
+                                                   JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .httpBasic(b -> b.disable())
                 .formLogin(f -> f.disable())
@@ -29,6 +44,10 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
+                .oauth2ResourceServer(o -> o
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                        .jwt(j -> j.jwtAuthenticationConverter(jwtAuthenticationConverter)))
                 .authorizeHttpRequests(a -> a
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/register",
