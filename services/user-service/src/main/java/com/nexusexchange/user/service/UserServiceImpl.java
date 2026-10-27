@@ -11,6 +11,7 @@ import com.nexusexchange.common.exception.ResourceNotFoundException;
 import com.nexusexchange.user.exception.UserAlreadyExistsException;
 import com.nexusexchange.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     @Transactional
     public UserProfileDto registerUser(UserRegistrationDto registrationDto) {
@@ -33,13 +36,12 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException("Email is already registered");
         }
 
-        // Mock hashing for the skeleton stage (before Spring Security is fully integrated)
-        String mockPasswordHash = "SHA256:" + registrationDto.getPassword().hashCode();
+        String passwordHash = passwordEncoder.encode(registrationDto.getPassword());
 
         User user = User.builder()
                 .username(registrationDto.getUsername())
                 .email(registrationDto.getEmail())
-                .passwordHash(mockPasswordHash)
+                .passwordHash(passwordHash)
                 .firstName(registrationDto.getFirstName())
                 .lastName(registrationDto.getLastName())
                 .phoneNumber(registrationDto.getPhoneNumber())
@@ -63,11 +65,10 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userOpt.get();
-        String expectedHash = "SHA256:" + loginDto.getPassword().hashCode();
-        if (!user.getPasswordHash().equals(expectedHash)) {
+
+        if(!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
             throw new InvalidCredentialsException("Invalid username/email or password");
         }
-
         // Generate a mock JWT for the skeleton
         String mockJwtToken = "mock-jwt-token-for-" + user.getUsername() + "-" + UUID.randomUUID();
 
