@@ -106,6 +106,12 @@ public class RefreshTokenService {
                 .build();
     }
 
+    /** Revokes every active refresh token of the user ("log out of all devices"). */
+    @Transactional
+    public int revokeAllForUser(Long userId) {
+        return refreshTokens.revokeAllActiveByUserId(userId, clock.instant());
+    }
+
     /** Revokes the token if it exists and is still active. Never fails, never reveals whether it existed. */
     @Transactional
     public void logout(String rawToken) {

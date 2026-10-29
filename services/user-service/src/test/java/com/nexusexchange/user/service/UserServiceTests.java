@@ -94,6 +94,56 @@ class UserServiceTests {
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
+    // ---------- changePassword ----------
+
+    @Test
+    void changePassword_wrongCurrentPassword_throwsInvalidCredentials() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(storedUser));
+
+        assertThatThrownBy(() -> userService.changePassword(1L,
+                new com.nexusexchange.user.dto.ChangePasswordRequest("not-my-password", "brand-new-pass")))
+                .isInstanceOf(InvalidCredentialsException.class);
+
+        verify(userRepository, never()).save(any(User.class));
+        verify(refreshTokenService, never()).revokeAllForUser(any());
+    }
+
+    @Test
+    void changePassword_sameAsCurrent_throwsBadRequest() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(storedUser));
+
+        assertThatThrownBy(() -> userService.changePassword(1L,
+                new com.nexusexchange.user.dto.ChangePasswordRequest(RAW_PASSWORD, RAW_PASSWORD)))
+                .isInstanceOf(com.nexusexchange.common.exception.BadRequestException.class);
+
+        verify(userRepository, never()).save(any(User.class));
+        verify(refreshTokenService, never()).revokeAllForUser(any());
+    }
+
+    @Test
+    void changePassword_success_savesNewHashAndRevokesAllRefreshTokens() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(storedUser));
+        String oldHash = storedUser.getPasswordHash();
+
+        userService.changePassword(1L,
+                new com.nexusexchange.user.dto.ChangePasswordRequest(RAW_PASSWORD, "brand-new-pass"));
+
+        User saved = captureSavedUser();
+        assertThat(saved.getPasswordHash()).isNotEqualTo(oldHash).isNotEqualTo("brand-new-pass");
+        assertThat(passwordEncoder.matches("brand-new-pass", saved.getPasswordHash())).isTrue();
+        assertThat(passwordEncoder.matches(RAW_PASSWORD, saved.getPasswordHash())).isFalse();
+        verify(refreshTokenService).revokeAllForUser(1L);
+    }
+
+    @Test
+    void changePassword_unknownUser_throwsNotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.changePassword(99L,
+                new com.nexusexchange.user.dto.ChangePasswordRequest("a-password", "brand-new-pass")))
+                .isInstanceOf(com.nexusexchange.common.exception.ResourceNotFoundException.class);
+    }
+
     // ---------- updateProfile ----------
 
     @Test

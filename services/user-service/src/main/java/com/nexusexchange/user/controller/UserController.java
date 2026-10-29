@@ -1,5 +1,6 @@
 package com.nexusexchange.user.controller;
 
+import com.nexusexchange.user.dto.ChangePasswordRequest;
 import com.nexusexchange.user.dto.UpdateProfileRequest;
 import com.nexusexchange.user.dto.UserProfileDto;
 import com.nexusexchange.user.service.UserService;
@@ -29,6 +30,13 @@ public class UserController {
                                                         @Valid @RequestBody UpdateProfileRequest request) {
         UserProfileDto updatedProfile = userService.updateProfile(userId(jwt), request);
         return ResponseEntity.ok(updatedProfile);
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal Jwt jwt,
+                                               @Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(userId(jwt), request);
+        return ResponseEntity.noContent().build();
     }
 
     /** The id comes from the verified token, never from a client-controlled header. */

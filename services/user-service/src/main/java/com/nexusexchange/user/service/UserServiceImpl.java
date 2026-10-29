@@ -155,6 +155,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public void changePassword(Long id, com.nexusexchange.user.dto.ChangePasswordRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Current password is incorrect");
+        }
+        // The current password is verified, so plain equality means "same as the current one"
+        if (request.newPassword().equals(request.currentPassword())) {
+            throw new com.nexusexchange.common.exception.BadRequestException(
+                    "New password must be different from the current password");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        // Log out of all devices. Access tokens already issued stay valid until they expire (max 15 min).
+        refreshTokenService.revokeAllForUser(id);
+    }
+
+    @Override
+    @Transactional
     public UserProfileDto updateProfile(Long id, UpdateProfileRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));

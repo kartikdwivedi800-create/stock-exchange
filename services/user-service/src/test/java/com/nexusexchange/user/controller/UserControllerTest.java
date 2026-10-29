@@ -127,4 +127,60 @@ class UserControllerTest {
         // The request type has no role/status, so the service can only ever receive name and phone
         verify(userService).updateProfile(42L, new UpdateProfileRequest("A", "B", null));
     }
+
+    // ---------- change password (NX-309) ----------
+
+    private static final String PASSWORD_URL = URL + "/password";
+
+    @Test
+    void changePasswordReturns204AndUsesIdFromToken() throws Exception {
+        mvc.perform(put(PASSWORD_URL).with(token()).header("X-User-Id", "1").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\"old-password\",\"newPassword\":\"new-password-1\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(userService).changePassword(42L,
+                new com.nexusexchange.user.dto.ChangePasswordRequest("old-password", "new-password-1"));
+    }
+
+    @Test
+    void changePasswordWithShortNewPasswordIs400() throws Exception {
+        mvc.perform(put(PASSWORD_URL).with(token()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\"old-password\",\"newPassword\":\"short\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'newPassword')]").exists());
+        verify(userService, never()).changePassword(anyLong(), any());
+    }
+
+    @Test
+    void changePasswordWithBlankCurrentPasswordIs400() throws Exception {
+        mvc.perform(put(PASSWORD_URL).with(token()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\" \",\"newPassword\":\"new-password-1\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'currentPassword')]").exists());
+    }
+
+    @Test
+    void changePasswordWithTooLongNewPasswordIs400() throws Exception {
+        mvc.perform(put(PASSWORD_URL).with(token()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\"old-password\",\"newPassword\":\"" + "a".repeat(73) + "\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void changePasswordWithWrongCurrentPasswordIs401() throws Exception {
+        org.mockito.Mockito.doThrow(new com.nexusexchange.user.exception.InvalidCredentialsException("Current password is incorrect"))
+                .when(userService).changePassword(anyLong(), any());
+
+        mvc.perform(put(PASSWORD_URL).with(token()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\"bad-password\",\"newPassword\":\"new-password-1\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void changePasswordWithoutTokenIs401() throws Exception {
+        mvc.perform(put(PASSWORD_URL).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPassword\":\"old-password\",\"newPassword\":\"new-password-1\"}"))
+                .andExpect(status().isUnauthorized());
+        verify(userService, never()).changePassword(anyLong(), any());
+    }
 }
