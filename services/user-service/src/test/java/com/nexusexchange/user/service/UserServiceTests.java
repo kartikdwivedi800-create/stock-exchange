@@ -52,7 +52,8 @@ class UserServiceTests {
     void setUp() {
         TokenService tokenService = new TokenService(JwtTestSupport.encoder(), JwtTestSupport.properties(),
                 JwtTestSupport.clockAt(java.time.Instant.now()));
-        userService = new UserServiceImpl(userRepository, passwordEncoder, tokenService, refreshTokenService);
+        userService = new UserServiceImpl(userRepository, passwordEncoder, tokenService, refreshTokenService,
+                JwtTestSupport.properties(), JwtTestSupport.clockAt(java.time.Instant.now()));
 
         registrationDto = UserRegistrationDto.builder()
                 .username("john_doe")
@@ -77,6 +78,7 @@ class UserServiceTests {
                 .lastName("Doe")
                 .phoneNumber("1234567890")
                 .role(Role.ROLE_USER)
+                .status(com.nexusexchange.common.enums.UserStatus.ACTIVE)
                 .build();
     }
 
@@ -205,6 +207,7 @@ class UserServiceTests {
         allowRegistration();
         userService.registerUser(registrationDto);
         User saved = captureSavedUser();
+        saved.setStatus(com.nexusexchange.common.enums.UserStatus.ACTIVE); // normally set by @PrePersist
         when(userRepository.findByUsernameIgnoreCase("john_doe")).thenReturn(Optional.of(saved));
 
         AuthResponseDto result = userService.loginUser(loginDto);

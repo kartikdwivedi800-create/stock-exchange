@@ -21,5 +21,8 @@ Registration, login and user profiles for Nexus Exchange.
 ## Configuration
 Environment variables (defaults in brackets): `DB_HOST` (`localhost`), `DB_PORT` (`5432`), `DB_NAME` (`user_db`), `DB_USERNAME` (`user_service`), `DB_PASSWORD` (`user_service`), `SERVER_PORT` (`8081`). Profile `docker` points the database at host `postgres`.
 
+## Login lockout
+After 5 consecutive wrong passwords (`nexus.security.login.max-failed-attempts`) an account is locked for 15 minutes (`lock-duration`) and login answers **423 Locked**, even with the right password. Trade-off we accept: a 423 reveals that the account exists (user enumeration), while unknown usernames get the same 401 as wrong passwords. A successful login resets the counter.
+
 ## Tests
 `UserServiceApplicationTests` runs against a Testcontainers PostgreSQL and is skipped when Docker is not running. `UserServiceTests` are plain unit tests.

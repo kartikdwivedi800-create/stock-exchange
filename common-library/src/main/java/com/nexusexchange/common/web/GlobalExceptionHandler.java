@@ -5,6 +5,7 @@ import com.nexusexchange.common.dto.ErrorResponse;
 import com.nexusexchange.common.exception.BadRequestException;
 import com.nexusexchange.common.exception.ConflictException;
 import com.nexusexchange.common.exception.ForbiddenException;
+import com.nexusexchange.common.exception.ResourceLockedException;
 import com.nexusexchange.common.exception.ResourceNotFoundException;
 import com.nexusexchange.common.exception.UnauthorizedException;
 import com.nexusexchange.common.exception.ValidationException;
@@ -59,6 +60,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex, WebRequest request) {
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(ResourceLockedException.class)
+    public ResponseEntity<ErrorResponse> handleLocked(ResourceLockedException ex, WebRequest request) {
+        return build(HttpStatus.LOCKED, ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(ForbiddenException.class)

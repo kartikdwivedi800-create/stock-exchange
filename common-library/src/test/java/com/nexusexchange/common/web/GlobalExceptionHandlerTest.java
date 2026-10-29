@@ -1,6 +1,7 @@
 package com.nexusexchange.common.web;
 
 import com.nexusexchange.common.exception.ConflictException;
+import com.nexusexchange.common.exception.ResourceLockedException;
 import com.nexusexchange.common.exception.ResourceNotFoundException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import jakarta.validation.Valid;
@@ -51,6 +52,14 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void lockedMapsTo423() throws Exception {
+        mvc.perform(get("/things/locked"))
+                .andExpect(status().isLocked())
+                .andExpect(jsonPath("$.status").value(423))
+                .andExpect(jsonPath("$.message").value("Thing is locked"));
+    }
+
+    @Test
     void optimisticLockFailureMapsTo409() throws Exception {
         mvc.perform(get("/things/stale"))
                 .andExpect(status().isConflict())
@@ -96,6 +105,7 @@ class GlobalExceptionHandlerTest {
                 case "missing" -> throw new ResourceNotFoundException("Thing missing not found");
                 case "taken" -> throw new ConflictException("Thing already exists");
                 case "stale" -> throw new ObjectOptimisticLockingFailureException(Object.class, 1L);
+                case "locked" -> throw new ResourceLockedException("Thing is locked");
                 case "later" -> throw new UnsupportedOperationException("Not implemented yet");
                 case "boom" -> throw new IllegalStateException("secret internal detail");
                 default -> id;

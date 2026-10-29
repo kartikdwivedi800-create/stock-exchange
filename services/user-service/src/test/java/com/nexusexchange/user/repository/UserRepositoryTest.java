@@ -103,4 +103,30 @@ class UserRepositoryTest {
                 .isEqualTo(earlier);
         assertThat(refreshTokens.findByTokenHash("o-active").orElseThrow().getRevokedAt()).isNull();
     }
+
+    @Test
+    void lockoutColumnsDefaultAndPersist() {
+        User saved = users.saveAndFlush(newUser("kartik", "kartik@example.com"));
+        assertThat(saved.getFailedLoginAttempts()).isZero();
+        assertThat(saved.getLockedUntil()).isNull();
+
+        Instant until = Instant.now().plus(15, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MICROS);
+        saved.setFailedLoginAttempts(3);
+        saved.setLockedUntil(until);
+        users.saveAndFlush(saved);
+
+        User reloaded = users.findById(saved.getId()).orElseThrow();
+        assertThat(reloaded.getFailedLoginAttempts()).isEqualTo(3);
+        assertThat(reloaded.getLockedUntil()).isEqualTo(until);
+    }
+
+    @Test
+    void negativeFailedLoginAttemptsViolatesCheckConstraint() {
+        User user = newUser("kartik", "kartik@example.com");
+        user.setFailedLoginAttempts(-1);
+
+        assertThatThrownBy(() -> users.saveAndFlush(user))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("ck_users_failed_login_attempts");
+    }
 }
