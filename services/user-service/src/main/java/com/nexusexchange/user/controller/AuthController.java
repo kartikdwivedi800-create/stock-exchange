@@ -1,9 +1,11 @@
 package com.nexusexchange.user.controller;
 
 import com.nexusexchange.user.dto.AuthResponseDto;
+import com.nexusexchange.user.dto.RefreshTokenRequest;
 import com.nexusexchange.user.dto.UserLoginDto;
 import com.nexusexchange.user.dto.UserRegistrationDto;
 import com.nexusexchange.user.dto.UserProfileDto;
+import com.nexusexchange.user.service.RefreshTokenService;
 import com.nexusexchange.user.service.UserService;
 import jakarta.validation.Valid;
 import com.nexusexchange.common.constants.ApiConstants;
@@ -22,6 +24,8 @@ public class AuthController {
 
     private final UserService userService;
 
+    private final RefreshTokenService refreshTokenService;
+
     @PostMapping("/register")
     public ResponseEntity<UserProfileDto> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
         UserProfileDto profile = userService.registerUser(registrationDto);
@@ -32,5 +36,17 @@ public class AuthController {
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginDto loginDto) {
         AuthResponseDto authResponse = userService.loginUser(loginDto);
         return ResponseEntity.ok(authResponse);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDto> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(refreshTokenService.refresh(request.refreshToken()));
+    }
+
+    /** Always 204: logging out twice is fine and the answer never reveals whether the token existed. */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequest request) {
+        refreshTokenService.logout(request.refreshToken());
+        return ResponseEntity.noContent().build();
     }
 }

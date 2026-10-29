@@ -38,6 +38,9 @@ class UserServiceTests {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private RefreshTokenService refreshTokenService;
+
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
 
     private UserServiceImpl userService;
@@ -49,7 +52,7 @@ class UserServiceTests {
     void setUp() {
         TokenService tokenService = new TokenService(JwtTestSupport.encoder(), JwtTestSupport.properties(),
                 JwtTestSupport.clockAt(java.time.Instant.now()));
-        userService = new UserServiceImpl(userRepository, passwordEncoder, tokenService);
+        userService = new UserServiceImpl(userRepository, passwordEncoder, tokenService, refreshTokenService);
 
         registrationDto = UserRegistrationDto.builder()
                 .username("john_doe")
@@ -184,6 +187,7 @@ class UserServiceTests {
     @Test
     void loginUser_correctPassword_succeeds() {
         when(userRepository.findByUsernameIgnoreCase("john_doe")).thenReturn(Optional.of(storedUser));
+        when(refreshTokenService.issue(storedUser)).thenReturn("raw-refresh-token");
 
         AuthResponseDto result = userService.loginUser(loginDto);
 
@@ -191,7 +195,7 @@ class UserServiceTests {
         assertThat(result.getAccessToken().split("\\.")).hasSize(3);
         assertThat(result.getTokenType()).isEqualTo("Bearer");
         assertThat(result.getExpiresIn()).isEqualTo(900L);
-        assertThat(result.getRefreshToken()).isNull();
+        assertThat(result.getRefreshToken()).isEqualTo("raw-refresh-token");
         assertThat(result.getUser().getUsername()).isEqualTo("john_doe");
     }
 

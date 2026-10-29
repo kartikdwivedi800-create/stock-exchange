@@ -1,6 +1,7 @@
 package com.nexusexchange.user.dto;
 
 import com.nexusexchange.user.entity.Role;
+import com.nexusexchange.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +26,19 @@ public class UserProfileDto {
     private UserStatus status;
     private Instant createdAt;
     private Instant updatedAt;
+
+    public static UserProfileDto from(User user) {
+        return UserProfileDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
 }

@@ -28,6 +28,8 @@ public class UserServiceImpl implements UserService {
 
     private final TokenService tokenService;
 
+    private final RefreshTokenService refreshTokenService;
+
     @Override
     @Transactional
     public UserProfileDto registerUser(UserRegistrationDto registrationDto) {
@@ -55,7 +57,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    // Not readOnly: login now inserts a refresh token row
+    @Transactional
     public AuthResponseDto loginUser(UserLoginDto loginDto) {
         Optional<User> userOpt = userRepository.findByUsernameIgnoreCase(loginDto.getUsernameOrEmail());
         if (userOpt.isEmpty()) {
@@ -74,6 +77,7 @@ public class UserServiceImpl implements UserService {
         return AuthResponseDto.builder()
                 .accessToken(tokenService.createAccessToken(user))
                 .expiresIn(tokenService.accessTokenExpiresInSeconds())
+                .refreshToken(refreshTokenService.issue(user))
                 .user(mapToProfileDto(user))
                 .build();
     }

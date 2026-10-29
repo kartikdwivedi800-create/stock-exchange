@@ -5,6 +5,8 @@ import com.nexusexchange.user.config.JsonAuthenticationEntryPoint;
 import com.nexusexchange.user.config.SecurityConfig;
 import com.nexusexchange.user.exception.InvalidCredentialsException;
 import com.nexusexchange.user.exception.UserAlreadyExistsException;
+import com.nexusexchange.user.exception.InvalidRefreshTokenException;
+import com.nexusexchange.user.service.RefreshTokenService;
 import com.nexusexchange.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,9 @@ class AuthControllerTest {
     /** Needed by oauth2ResourceServer(jwt); the real decoder is covered by JwtConfigTest. */
     @MockitoBean
     private JwtDecoder jwtDecoder;
+
+    @MockitoBean
+    private RefreshTokenService refreshTokenService;
 
     @Test
     void loginReturnsAccessTokenResponseShape() throws Exception {
@@ -209,6 +214,59 @@ class AuthControllerTest {
                         .assertThat(result.getResponse().getHeader("WWW-Authenticate")).isNull());
         mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON).content(VALID_REGISTRATION))
                 .andExpect(status().is2xxSuccessful());
+    }
+
+    // ---------- refresh / logout (NX-303) ----------
+
+    private static final String REFRESH_BODY = "{\"refreshToken\":\"some-raw-token\"}";
+
+    @Test
+    void refreshReturns200WithNewPair() throws Exception {
+        when(refreshTokenService.refresh("some-raw-token")).thenReturn(AuthResponseDto.builder()
+                .accessToken("new.access.token")
+                .expiresIn(900)
+                .refreshToken("new-raw-refresh")
+                .user(UserProfileDto.builder().id(1L).username("kartik").build())
+                .build());
+
+        mvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON).content(REFRESH_BODY))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("new.access.token"))
+                .andExpect(jsonPath("$.refreshToken").value("new-raw-refresh"))
+                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+    }
+
+    @Test
+    void refreshWithInvalidTokenReturns401Json() throws Exception {
+        when(refreshTokenService.refresh(any())).thenThrow(new InvalidRefreshTokenException());
+
+        mvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON).content(REFRESH_BODY))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.path").value("/api/v1/auth/refresh"));
+    }
+
+    @Test
+    void refreshWithBlankTokenReturns400() throws Exception {
+        mvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"  \"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'refreshToken')]").exists());
+        verify(refreshTokenService, never()).refresh(any());
+    }
+
+    @Test
+    void logoutReturns204AndCallsService() throws Exception {
+        mvc.perform(post("/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON).content(REFRESH_BODY))
+                .andExpect(status().isNoContent());
+        verify(refreshTokenService).logout("some-raw-token");
+    }
+
+    @Test
+    void logoutWithBlankTokenReturns400() throws Exception {
+        mvc.perform(post("/api/v1/auth/logout").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest());
+        verify(refreshTokenService, never()).logout(any());
     }
 
     private static String registrationWithPassword(String password) {

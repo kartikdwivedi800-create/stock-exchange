@@ -74,4 +74,33 @@ class UserRepositoryTest {
         assertThat(found.isActive(Instant.now())).isTrue();
         assertThat(found.getUser().getId()).isEqualTo(user.getId());
     }
+
+    @Test
+    void findByTokenHash_unknownHashIsEmpty() {
+        assertThat(refreshTokens.findByTokenHash("no-such-hash")).isEmpty();
+    }
+
+    @Test
+    void revokeAllActive_revokesOnlyActiveTokensOfThatUser() {
+        Instant now = Instant.now().truncatedTo(ChronoUnit.MICROS);
+        Instant earlier = now.minus(1, ChronoUnit.HOURS);
+        Instant future = now.plus(7, ChronoUnit.DAYS);
+        User kartik = users.saveAndFlush(newUser("kartik", "kartik@example.com"));
+        User other = users.saveAndFlush(newUser("other", "other@example.com"));
+        refreshTokens.save(RefreshToken.builder().user(kartik).tokenHash("k-active-1").expiresAt(future).build());
+        refreshTokens.save(RefreshToken.builder().user(kartik).tokenHash("k-active-2").expiresAt(future).build());
+        refreshTokens.save(RefreshToken.builder().user(kartik).tokenHash("k-already-revoked")
+                .expiresAt(future).revokedAt(earlier).build());
+        refreshTokens.save(RefreshToken.builder().user(other).tokenHash("o-active").expiresAt(future).build());
+        refreshTokens.flush();
+
+        int revoked = refreshTokens.revokeAllActiveByUserId(kartik.getId(), now);
+
+        assertThat(revoked).isEqualTo(2);
+        assertThat(refreshTokens.findByTokenHash("k-active-1").orElseThrow().getRevokedAt()).isEqualTo(now);
+        assertThat(refreshTokens.findByTokenHash("k-active-2").orElseThrow().getRevokedAt()).isEqualTo(now);
+        assertThat(refreshTokens.findByTokenHash("k-already-revoked").orElseThrow().getRevokedAt())
+                .isEqualTo(earlier);
+        assertThat(refreshTokens.findByTokenHash("o-active").orElseThrow().getRevokedAt()).isNull();
+    }
 }
