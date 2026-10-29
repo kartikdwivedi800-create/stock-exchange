@@ -1,6 +1,7 @@
 package com.nexusexchange.user.service;
 
 import com.nexusexchange.user.dto.AuthResponseDto;
+import com.nexusexchange.user.dto.UpdateProfileRequest;
 import com.nexusexchange.user.dto.UserLoginDto;
 import com.nexusexchange.user.dto.UserRegistrationDto;
 import com.nexusexchange.user.dto.UserProfileDto;
@@ -13,5 +14,5 @@ public interface UserService {
 
     UserProfileDto getUserProfile(Long id);
 
-    UserProfileDto updateUserProfile(Long id, UserProfileDto profileDto);
+    UserProfileDto updateProfile(Long id, UpdateProfileRequest request);
 }

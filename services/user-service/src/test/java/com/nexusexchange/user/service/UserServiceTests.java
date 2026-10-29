@@ -89,7 +89,38 @@ class UserServiceTests {
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
+    // ---------- updateProfile ----------
+
+    @Test
+    void updateProfile_changesOnlyNameAndPhone() {
+        storedUser.setStatus(com.nexusexchange.common.enums.UserStatus.ACTIVE);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(storedUser));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        UserProfileDto result = userService.updateProfile(1L,
+                new com.nexusexchange.user.dto.UpdateProfileRequest("Jane", "Roe", "+441234567"));
+
+        assertThat(result.getFirstName()).isEqualTo("Jane");
+        assertThat(result.getLastName()).isEqualTo("Roe");
+        assertThat(result.getPhoneNumber()).isEqualTo("+441234567");
+        assertThat(result.getUsername()).isEqualTo("john_doe");
+        assertThat(result.getEmail()).isEqualTo("john@example.com");
+        assertThat(result.getRole()).isEqualTo(Role.ROLE_USER);
+        assertThat(result.getStatus()).isEqualTo(com.nexusexchange.common.enums.UserStatus.ACTIVE);
+    }
+
+    @Test
+    void updateProfile_unknownUser_throwsNotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.updateProfile(99L,
+                new com.nexusexchange.user.dto.UpdateProfileRequest("A", "B", null)))
+                .isInstanceOf(com.nexusexchange.common.exception.ResourceNotFoundException.class);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
     // ---------- register ----------
+
 
     @Test
     void registerUser_returnsProfile() {

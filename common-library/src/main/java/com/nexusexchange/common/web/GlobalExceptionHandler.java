@@ -10,6 +10,7 @@ import com.nexusexchange.common.exception.UnauthorizedException;
 import com.nexusexchange.common.exception.ValidationException;
 import com.nexusexchange.common.util.RequestIdGenerator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -48,6 +49,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex, WebRequest request) {
         return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> handleOptimisticLock(ObjectOptimisticLockingFailureException ex, WebRequest request) {
+        return build(HttpStatus.CONFLICT, "The resource was modified by another request. Please retry.", request, null);
     }
 
     @ExceptionHandler(UnauthorizedException.class)

@@ -1,6 +1,7 @@
 package com.nexusexchange.user.service;
 
 import com.nexusexchange.user.dto.AuthResponseDto;
+import com.nexusexchange.user.dto.UpdateProfileRequest;
 import com.nexusexchange.user.dto.UserLoginDto;
 import com.nexusexchange.user.dto.UserRegistrationDto;
 import com.nexusexchange.user.dto.UserProfileDto;
@@ -87,14 +88,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserProfileDto updateUserProfile(Long id, UserProfileDto profileDto) {
+    public UserProfileDto updateProfile(Long id, UpdateProfileRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-        // Update profile fields
-        user.setFirstName(profileDto.getFirstName());
-        user.setLastName(profileDto.getLastName());
-        user.setPhoneNumber(profileDto.getPhoneNumber());
+        // Only these three fields are editable by the user
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setPhoneNumber(request.phoneNumber());
 
         User updatedUser = userRepository.save(user);
         return mapToProfileDto(updatedUser);
