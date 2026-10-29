@@ -91,6 +91,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<UserProfileDto> listUsers(org.springframework.data.domain.Pageable pageable) {
+        return userRepository.findAll(pageable).map(this::mapToProfileDto);
+    }
+
+    @Override
     @Transactional
     public UserProfileDto updateProfile(Long id, UpdateProfileRequest request) {
         User user = userRepository.findById(id)

@@ -49,3 +49,7 @@ nexus:
     login:
       max-failed-attempts: 5
       lock-duration: 15m
+  admin:
+    # Initial admin account; seeding is skipped unless BOTH are set (never seeded via Flyway)
+    username: ${ADMIN_USERNAME:}
+    password: ${ADMIN_PASSWORD:}
