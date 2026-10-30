@@ -77,17 +77,19 @@ gantt
 | NX-209 | Testcontainers base | M | Shared abstract `IntegrationTest` (Postgres/Kafka/Redis) in a `test-support` module; one repository test per service |
 
 ## Sprint 3 — Authentication & security
-**Goal:** real, secure identity.
+**Goal:** real, secure identity. Detailed spec: [sprints/sprint-3-auth.md](sprints/sprint-3-auth.md) (ADR-0012).
 
 | ID | Story | Size | Acceptance criteria |
 |---|---|---|---|
 | NX-301 | BCrypt password hashing | S | `PasswordEncoder` bean; mock hash removed; existing tests updated |
-| NX-302 | JWT access tokens | M | HS256, 15 min, claims `sub`, `role`, `jti`; secret from env; `JwtService` unit-tested |
+| NX-302 | JWT access tokens | M | Spring Security `JwtEncoder`/`JwtDecoder` (resource server), HS256, 15 min, claims `iss`, `sub`, `username`, `role`, `jti`; secret from env (>= 32 bytes); jjwt removed |
 | NX-303 | Refresh & logout | M | `POST /auth/refresh` rotates the token (hashed in DB); `POST /auth/logout` revokes; reuse of a revoked token → 401 |
 | NX-304 | Spring Security config | M | Stateless; `/auth/**` open; everything else authenticated; JSON 401/403 via common `ErrorResponse` |
 | NX-305 | Profile endpoints | S | `GET/PUT /api/v1/users/me`; validation on update |
 | NX-306 | Roles & admin seed | S | `ROLE_ADMIN` user seeded from env on startup; `@PreAuthorize` works |
 | NX-307 | Auth integration tests | M | Register → login → refresh → me → logout flow against Testcontainers Postgres |
+| NX-308 | Login brute-force lockout | M | V3 migration (`failed_login_attempts`, `locked_until`); 5 failures → locked 15 min → 423 |
+| NX-309 | Change password | S | `PUT /users/me/password`; verifies current password; revokes all refresh tokens |
 
 ## Sprint 4 — API gateway & first Kafka event
 **Goal:** a single entry point and the event backbone switched on.

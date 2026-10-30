@@ -1,6 +1,7 @@
 package com.nexusexchange.user.service;
 
 import com.nexusexchange.user.dto.AuthResponseDto;
+import com.nexusexchange.user.dto.UpdateProfileRequest;
 import com.nexusexchange.user.dto.UserLoginDto;
 import com.nexusexchange.user.dto.UserRegistrationDto;
 import com.nexusexchange.user.dto.UserProfileDto;
@@ -10,18 +11,49 @@ import com.nexusexchange.user.exception.InvalidCredentialsException;
 import com.nexusexchange.common.exception.ResourceNotFoundException;
 import com.nexusexchange.user.exception.UserAlreadyExistsException;
 import com.nexusexchange.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import com.nexusexchange.user.config.SecurityProperties;
+import com.nexusexchange.user.exception.AccountLockedException;
+import com.nexusexchange.user.exception.AccountNotActiveException;
+import com.nexusexchange.common.enums.UserStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private static final String INVALID_CREDENTIALS = "Invalid username/email or password";
+
     private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final TokenService tokenService;
+
+    private final RefreshTokenService refreshTokenService;
+
+    private final SecurityProperties securityProperties;
+
+    private final Clock clock;
+
+    /** BCrypt hash (same cost as real ones) checked when the username is unknown. */
+    private final String dummyPasswordHash;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                           TokenService tokenService, RefreshTokenService refreshTokenService,
+                           SecurityProperties securityProperties, Clock clock) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
+        this.refreshTokenService = refreshTokenService;
+        this.securityProperties = securityProperties;
+        this.clock = clock;
+        this.dummyPasswordHash = passwordEncoder.encode("nexus-dummy-password-never-matches");
+    }
 
     @Override
     @Transactional
@@ -33,13 +65,12 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException("Email is already registered");
         }
 
-        // Mock hashing for the skeleton stage (before Spring Security is fully integrated)
-        String mockPasswordHash = "SHA256:" + registrationDto.getPassword().hashCode();
+        String passwordHash = passwordEncoder.encode(registrationDto.getPassword());
 
         User user = User.builder()
                 .username(registrationDto.getUsername())
                 .email(registrationDto.getEmail())
-                .passwordHash(mockPasswordHash)
+                .passwordHash(passwordHash)
                 .firstName(registrationDto.getFirstName())
                 .lastName(registrationDto.getLastName())
                 .phoneNumber(registrationDto.getPhoneNumber())
@@ -50,31 +81,62 @@ public class UserServiceImpl implements UserService {
         return mapToProfileDto(savedUser);
     }
 
+    /**
+     * Not readOnly (it writes the failed-attempt counter and a refresh token). noRollbackFor: the counter
+     * update must be committed even though the login fails with InvalidCredentialsException.
+     */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(noRollbackFor = InvalidCredentialsException.class)
     public AuthResponseDto loginUser(UserLoginDto loginDto) {
+        Instant now = clock.instant();
         Optional<User> userOpt = userRepository.findByUsernameIgnoreCase(loginDto.getUsernameOrEmail());
         if (userOpt.isEmpty()) {
             userOpt = userRepository.findByEmailIgnoreCase(loginDto.getUsernameOrEmail());
         }
 
         if (userOpt.isEmpty()) {
-            throw new InvalidCredentialsException("Invalid username/email or password");
+            // Same BCrypt work as a real check, so response time does not reveal unknown usernames
+            passwordEncoder.matches(loginDto.getPassword(), dummyPasswordHash);
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
         }
 
         User user = userOpt.get();
-        String expectedHash = "SHA256:" + loginDto.getPassword().hashCode();
-        if (!user.getPasswordHash().equals(expectedHash)) {
-            throw new InvalidCredentialsException("Invalid username/email or password");
+
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(now)) {
+            throw new AccountLockedException();
+        }
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new AccountNotActiveException();
         }
 
-        // Generate a mock JWT for the skeleton
-        String mockJwtToken = "mock-jwt-token-for-" + user.getUsername() + "-" + UUID.randomUUID();
+        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPasswordHash())) {
+            registerFailedAttempt(user, now);
+            throw new InvalidCredentialsException(INVALID_CREDENTIALS);
+        }
+
+        if (user.getFailedLoginAttempts() != 0 || user.getLockedUntil() != null) {
+            user.setFailedLoginAttempts(0);
+            user.setLockedUntil(null);
+            userRepository.save(user);
+        }
 
         return AuthResponseDto.builder()
-                .token(mockJwtToken)
+                .accessToken(tokenService.createAccessToken(user))
+                .expiresIn(tokenService.accessTokenExpiresInSeconds())
+                .refreshToken(refreshTokenService.issue(user))
                 .user(mapToProfileDto(user))
                 .build();
+    }
+
+    private void registerFailedAttempt(User user, Instant now) {
+        SecurityProperties.Login login = securityProperties.login();
+        int attempts = user.getFailedLoginAttempts() + 1;
+        if (attempts >= login.maxFailedAttempts()) {
+            user.setLockedUntil(now.plus(login.lockDuration()));
+            attempts = 0;
+        }
+        user.setFailedLoginAttempts(attempts);
+        userRepository.save(user);
     }
 
     @Override
@@ -86,15 +148,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<UserProfileDto> listUsers(org.springframework.data.domain.Pageable pageable) {
+        return userRepository.findAll(pageable).map(this::mapToProfileDto);
+    }
+
+    @Override
     @Transactional
-    public UserProfileDto updateUserProfile(Long id, UserProfileDto profileDto) {
+    public void changePassword(Long id, com.nexusexchange.user.dto.ChangePasswordRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-        // Update profile fields
-        user.setFirstName(profileDto.getFirstName());
-        user.setLastName(profileDto.getLastName());
-        user.setPhoneNumber(profileDto.getPhoneNumber());
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new InvalidCredentialsException("Current password is incorrect");
+        }
+        // The current password is verified, so plain equality means "same as the current one"
+        if (request.newPassword().equals(request.currentPassword())) {
+            throw new com.nexusexchange.common.exception.BadRequestException(
+                    "New password must be different from the current password");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        // Log out of all devices. Access tokens already issued stay valid until they expire (max 15 min).
+        refreshTokenService.revokeAllForUser(id);
+    }
+
+    @Override
+    @Transactional
+    public UserProfileDto updateProfile(Long id, UpdateProfileRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // Only these three fields are editable by the user
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setPhoneNumber(request.phoneNumber());
 
         User updatedUser = userRepository.save(user);
         return mapToProfileDto(updatedUser);

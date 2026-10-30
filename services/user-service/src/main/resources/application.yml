@@ -38,3 +38,18 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+nexus:
+  security:
+    jwt:
+      issuer: nexus-exchange
+      secret: ${JWT_SECRET:dev-only-secret-change-me-at-least-32-bytes-long!!}   # HS256 needs >= 32 bytes
+      access-token-ttl: 15m
+    refresh-token-ttl: 7d
+    login:
+      max-failed-attempts: 5
+      lock-duration: 15m
+  admin:
+    # Initial admin account; seeding is skipped unless BOTH are set (never seeded via Flyway)
+    username: ${ADMIN_USERNAME:}
+    password: ${ADMIN_PASSWORD:}

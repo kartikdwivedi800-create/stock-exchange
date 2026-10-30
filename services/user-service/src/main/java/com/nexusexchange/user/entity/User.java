@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-/** Mirrors table `users` (migrations V1, V2). */
+/** Mirrors table `users` (migrations V1, V2, V3). */
 @Entity
 @Table(name = "users")
 @Getter
@@ -56,6 +56,14 @@ public class User {
     /** Optimistic locking: an update based on a stale copy fails instead of silently overwriting. */
     @Version
     private Long version;
+
+    /** Consecutive wrong passwords since the last success or lock (migration V3). */
+    @Column(name = "failed_login_attempts", nullable = false)
+    private int failedLoginAttempts;
+
+    /** While in the future, login is refused with 423 (migration V3). */
+    @Column(name = "locked_until")
+    private Instant lockedUntil;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

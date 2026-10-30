@@ -57,13 +57,15 @@
 - [x] Testcontainers base module + repository tests in every service (NX-209)
 
 ## 3. Identity & security — Sprint 3
-- [ ] BCrypt (NX-301)
-- [ ] JWT access tokens (NX-302)
-- [ ] Refresh + logout (NX-303)
-- [ ] Spring Security config (NX-304)
-- [ ] `/users/me` endpoints (NX-305)
-- [ ] Roles + admin seed (NX-306)
-- [ ] Auth integration tests (NX-307)
+- [x] BCrypt (NX-301)
+- [x] JWT access tokens (NX-302)
+- [x] Refresh + logout (NX-303)
+- [x] Spring Security config (NX-304)
+- [x] `/users/me` endpoints (NX-305)
+- [x] Roles + admin seed (NX-306)
+- [x] Auth integration tests (NX-307)
+- [x] Login brute-force lockout (NX-308)
+- [x] Change password (NX-309)
 
 ## 4. API gateway & event backbone — Sprint 4
 - [ ] api-gateway module + routes (NX-401)

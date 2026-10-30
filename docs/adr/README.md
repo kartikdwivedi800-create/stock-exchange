@@ -15,3 +15,4 @@ Each file records one decision: the context, what we decided, the consequences, 
 | 0009 | [Configuration through Spring profiles and environment variables](0009-config-env-vars.md) | Accepted | 2026-09-24 |
 | 0010 | [Retire connectivity-test-service](0010-retire-connectivity-test-service.md) | Accepted | 2026-09-24 |
 | 0011 | [Prices are generated inside the exchange; Kaggle data only seeds the simulator](0011-self-generated-prices-kaggle-seed.md) | Accepted | 2026-09-24 |
+| 0012 | [Every service validates JWTs itself, using Spring Security's resource server](0012-jwt-validated-by-every-service.md) | Accepted | 2026-10-22 |
